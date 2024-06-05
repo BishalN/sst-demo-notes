@@ -1,9 +1,34 @@
 import ReactDOM from "react-dom/client";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
-import { routeTree } from "./routeTree.gen";
+import { createRouter, RouterProvider } from "@tanstack/react-router";
 
 import { Amplify } from "aws-amplify";
 import config from "./lib/config";
+import { routeTree } from "./routeTree.gen";
+import { AuthProvider } from "./auth";
+import React from "react";
+import { useAuth } from "./hooks/useAuth";
+
+// Set up a Router instance
+const router = createRouter({
+  routeTree,
+  defaultPreload: "intent",
+  context: {
+    auth: undefined!, // This will be set after we wrap the app in an AuthProvider
+  },
+});
+
+function InnerApp() {
+  const auth = useAuth();
+  return <RouterProvider router={router} context={{ auth }} />;
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <InnerApp />
+    </AuthProvider>
+  );
+}
 
 Amplify.configure({
   Auth: {
@@ -32,12 +57,6 @@ Amplify.configure({
   },
 });
 
-// Set up a Router instance
-const router = createRouter({
-  routeTree,
-  defaultPreload: "intent",
-});
-
 // Register things for typesafety
 declare module "@tanstack/react-router" {
   interface Register {
@@ -49,5 +68,9 @@ const rootElement = document.getElementById("app")!;
 
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
-  root.render(<RouterProvider router={router} />);
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
 }
