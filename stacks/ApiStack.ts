@@ -2,7 +2,7 @@ import { Api, Config, StackContext, use } from "sst/constructs";
 import { StorageStack } from "./StorageStack";
 
 export function APIStack({ stack }: StackContext) {
-  const { table, bucket } = use(StorageStack);
+  const { table, bucket, bookTable } = use(StorageStack);
 
   const STRIPE_SECRET_KEY = new Config.Secret(stack, "STRIPE_SECRET_KEY");
 
@@ -10,7 +10,7 @@ export function APIStack({ stack }: StackContext) {
     defaults: {
       authorizer: "iam",
       function: {
-        bind: [table, STRIPE_SECRET_KEY],
+        bind: [table, bookTable, STRIPE_SECRET_KEY],
       },
     },
     cors: true,
@@ -20,6 +20,13 @@ export function APIStack({ stack }: StackContext) {
       "GET /notes": "packages/functions/src/list.main",
       "PUT /notes/{id}": "packages/functions/src/update.main",
       "DELETE /notes/{id}": "packages/functions/src/delete.main",
+
+      "POST /books": "packages/functions/src/books/create.main",
+      "GET /books/{id}": "packages/functions/src/books/get.main",
+      "GET /books": "packages/functions/src/books/list.main",
+      "PUT /books/{id}": "packages/functions/src/books/update.main",
+      "DELETE /books/{id}": "packages/functions/src/books/delete.main",
+
       "POST /billing": "packages/functions/src/billing.main",
     },
   });

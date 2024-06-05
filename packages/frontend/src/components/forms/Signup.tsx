@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Link, Route, useRouter } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 
 const formSchema = z
   .object({
@@ -33,6 +34,10 @@ const formSchema = z
     path: ["confirmPassword"],
   });
 
+const confirmFormSchema = z.object({
+  confirmationCode: z.string().min(6, { message: "Please enter a valid code" }),
+});
+
 interface SingupFormProps {
   Route: Route;
 }
@@ -42,6 +47,9 @@ export function SignupForm({ Route }: SingupFormProps) {
   const router = useRouter();
   const navigate = Route.useNavigate();
   const search = Route.useSearch();
+
+  const [isConfirming, setIsConfirming] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,22 +59,65 @@ export function SignupForm({ Route }: SingupFormProps) {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  const confirmForm = useForm<z.infer<typeof confirmFormSchema>>({
+    resolver: zodResolver(confirmFormSchema),
+    defaultValues: {
+      confirmationCode: "",
+    },
+  });
 
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const res = await Auth.signUp(values.email, values.password);
-      console.log(res);
-      await auth.login(values.email);
+      await Auth.signUp(values.email, values.password);
       await router.invalidate();
-      // go to code page where we can verify users email
-      // await navigate({ to: search.redirect || fallback });
+      setIsConfirming(true);
     } catch (error) {
       console.log(error);
     }
   }
+
+  async function onConfirm(values: z.infer<typeof confirmFormSchema>) {
+    try {
+      // get values from previous form
+      const { email, password } = form.getValues();
+      await Auth.confirmSignUp(email, values.confirmationCode);
+      await Auth.signIn(email, password);
+      await auth.login(email);
+      await router.navigate({ to: "/dashboard" });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  if (isConfirming) {
+    return (
+      <Form {...confirmForm}>
+        <form
+          onSubmit={confirmForm.handleSubmit(onConfirm)}
+          className="space-y-8"
+        >
+          <FormField
+            control={confirmForm.control}
+            name="confirmationCode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Confirmation Code</FormLabel>
+                <FormControl>
+                  <Input placeholder="123456" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button type="submit" className="w-full">
+            Confirm
+          </Button>
+        </form>
+      </Form>
+    );
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

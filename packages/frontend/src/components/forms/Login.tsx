@@ -44,10 +44,6 @@ export function LoginForm({ route: Route }: LoginFormProps) {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-
     try {
       const res = await Auth.signIn(values.email, values.password);
       console.log(res);
