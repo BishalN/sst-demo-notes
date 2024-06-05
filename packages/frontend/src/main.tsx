@@ -17,7 +17,7 @@ const router = createRouter({
   },
 });
 
-function InnerApp() {
+export function InnerApp() {
   const auth = useAuth();
   return <RouterProvider router={router} context={{ auth }} />;
 }
@@ -32,28 +32,25 @@ function App() {
 
 Amplify.configure({
   Auth: {
-    Cognito: {
-      userPoolId: config.cognito.USER_POOL_ID,
-      userPoolClientId: config.cognito.APP_CLIENT_ID,
-      loginWith: { email: true },
-      passwordFormat: { minLength: 6 },
-    },
+    mandatorySignIn: true,
+    region: config.cognito.REGION,
+    userPoolId: config.cognito.USER_POOL_ID,
+    identityPoolId: config.cognito.IDENTITY_POOL_ID,
+    userPoolWebClientId: config.cognito.APP_CLIENT_ID,
   },
   Storage: {
-    S3: {
-      bucket: config.s3.BUCKET,
-      region: config.s3.REGION,
-      // identityPoolId: config.cognito.IDENTITY_POOL_ID,
-    },
+    region: config.s3.REGION,
+    bucket: config.s3.BUCKET,
+    identityPoolId: config.cognito.IDENTITY_POOL_ID,
   },
   API: {
-    REST: {
-      notes: {
+    endpoints: [
+      {
+        name: "notes",
         endpoint: config.apiGateway.URL,
         region: config.apiGateway.REGION,
-        service: "notes",
       },
-    },
+    ],
   },
 });
 

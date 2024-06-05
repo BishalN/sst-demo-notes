@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Auth } from "aws-amplify";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +14,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Link } from "@tanstack/react-router";
+import { Link, Route, useRouter } from "@tanstack/react-router";
+import { useAuth } from "@/hooks/useAuth";
 
 const formSchema = z
   .object({
@@ -31,7 +33,15 @@ const formSchema = z
     path: ["confirmPassword"],
   });
 
-export function SignupForm() {
+interface SingupFormProps {
+  Route: Route;
+}
+
+export function SignupForm({ Route }: SingupFormProps) {
+  const auth = useAuth();
+  const router = useRouter();
+  const navigate = Route.useNavigate();
+  const search = Route.useSearch();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,10 +51,21 @@ export function SignupForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
+
+    try {
+      const res = await Auth.signUp(values.email, values.password);
+      console.log(res);
+      await auth.login(values.email);
+      await router.invalidate();
+      // go to code page where we can verify users email
+      // await navigate({ to: search.redirect || fallback });
+    } catch (error) {
+      console.log(error);
+    }
   }
   return (
     <Form {...form}>

@@ -28,7 +28,7 @@ export function LoginComponent() {
               Enter your email below to login to your account
             </p>
           </div>
-          <LoginForm />
+          <LoginForm route={Route} />
         </div>
       </div>
       <div className="hidden bg-muted lg:block">
