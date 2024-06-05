@@ -1,41 +1,53 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.tsx";
+import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { routeTree } from "./routeTree.gen";
 
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./index.css";
-import { BrowserRouter as Router } from "react-router-dom";
 import { Amplify } from "aws-amplify";
-import config from "./config.ts";
+import config from "./lib/config";
 
 Amplify.configure({
   Auth: {
-    mandatorySignIn: true,
-    region: config.cognito.REGION,
-    userPoolId: config.cognito.USER_POOL_ID,
-    identityPoolId: config.cognito.IDENTITY_POOL_ID,
-    userPoolWebClientId: config.cognito.APP_CLIENT_ID,
+    Cognito: {
+      userPoolId: config.cognito.USER_POOL_ID,
+      userPoolClientId: config.cognito.APP_CLIENT_ID,
+      loginWith: { email: true },
+      passwordFormat: { minLength: 6 },
+    },
   },
   Storage: {
-    region: config.s3.REGION,
-    bucket: config.s3.BUCKET,
-    identityPoolId: config.cognito.IDENTITY_POOL_ID,
+    S3: {
+      bucket: config.s3.BUCKET,
+      region: config.s3.REGION,
+      // identityPoolId: config.cognito.IDENTITY_POOL_ID,
+    },
   },
   API: {
-    endpoints: [
-      {
-        name: "notes",
+    REST: {
+      notes: {
         endpoint: config.apiGateway.URL,
         region: config.apiGateway.REGION,
+        service: "notes",
       },
-    ],
+    },
   },
 });
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <Router>
-      <App />
-    </Router>
-  </React.StrictMode>
-);
+// Set up a Router instance
+const router = createRouter({
+  routeTree,
+  defaultPreload: "intent",
+});
+
+// Register things for typesafety
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: typeof router;
+  }
+}
+
+const rootElement = document.getElementById("app")!;
+
+if (!rootElement.innerHTML) {
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(<RouterProvider router={router} />);
+}
