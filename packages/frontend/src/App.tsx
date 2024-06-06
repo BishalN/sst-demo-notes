@@ -43,15 +43,43 @@ function App() {
         <Navbar collapseOnSelect bg="light" expand="md" className="mb-3 px-3">
           <Navbar.Brand className="fw-bold text-muted">Scratch</Navbar.Brand>
           <Navbar.Toggle />
-          <Navbar.Collapse className="justify-content-end">
-            <Nav activeKey={window.location.pathname}>
+          <Navbar.Collapse>
+            <Nav style={{ width: "100%" }} activeKey={window.location.pathname}>
               {isAuthenticated ? (
-                <>
-                  <LinkContainer to="/settings">
-                    <Nav.Link>Settings</Nav.Link>
-                  </LinkContainer>
-                  <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
-                </>
+                <div
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    textDecoration: "underline",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "5px",
+                    }}
+                  >
+                    <LinkContainer to="/">
+                      <Nav.Link>My Collections</Nav.Link>
+                    </LinkContainer>
+                    <LinkContainer to="/notes">
+                      <Nav.Link>Notes</Nav.Link>
+                    </LinkContainer>
+
+                    <LinkContainer to="/search">
+                      <Nav.Link>Search</Nav.Link>
+                    </LinkContainer>
+                  </div>
+
+                  <div style={{ display: "flex", gap: "5px" }}>
+                    <LinkContainer to="/settings">
+                      <Nav.Link>Settings</Nav.Link>
+                    </LinkContainer>
+                    <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+                  </div>
+                </div>
               ) : (
                 <>
                   <LinkContainer to="/signup">

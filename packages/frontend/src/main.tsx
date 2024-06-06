@@ -7,6 +7,8 @@ import "./index.css";
 import { BrowserRouter as Router } from "react-router-dom";
 import { Amplify } from "aws-amplify";
 import config from "./config.ts";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 Amplify.configure({
   Auth: {
@@ -28,14 +30,24 @@ Amplify.configure({
         endpoint: config.apiGateway.URL,
         region: config.apiGateway.REGION,
       },
+      {
+        name: "books",
+        endpoint: config.apiGateway.URL,
+        region: config.apiGateway.REGION,
+      },
     ],
   },
 });
 
+const queryClient = new QueryClient();
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Router>
-      <App />
-    </Router>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <App />
+      </Router>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   </React.StrictMode>
 );

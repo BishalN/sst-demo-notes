@@ -12,6 +12,7 @@ export function StorageStack({ stack }: StackContext) {
     ],
   });
 
+  // TODO: create a relationship between the notes and books tables
   const table = new Table(stack, "Notes", {
     fields: {
       userId: "string",
@@ -20,5 +21,14 @@ export function StorageStack({ stack }: StackContext) {
     primaryIndex: { partitionKey: "userId", sortKey: "notesId" },
   });
 
-  return { table, bucket };
+  // now lets create another table for books
+  const bookTable = new Table(stack, "mybooks", {
+    fields: {
+      userId: "string",
+      bookId: "string",
+    },
+    primaryIndex: { partitionKey: "userId", sortKey: "bookId" },
+  });
+
+  return { table, bucket, bookTable };
 }
