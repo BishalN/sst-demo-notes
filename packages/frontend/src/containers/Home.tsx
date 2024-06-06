@@ -7,8 +7,8 @@ import { LinkContainer } from "react-router-bootstrap";
 import { BsPencilSquare } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { BookType } from "../types/book";
 import { Button } from "react-bootstrap";
+import { SearchBookType } from "../types/searchBook";
 
 function loadNotes(): Promise<NoteType[]> {
   return API.get("notes", "/notes", {});
@@ -90,7 +90,7 @@ function renderLander() {
   );
 }
 
-function loadBooks(): Promise<Array<BookType>> {
+function loadBooks(): Promise<Array<SearchBookType>> {
   return API.get("books", "/books", {});
 }
 
@@ -110,7 +110,9 @@ export default function NewHome() {
 
   return (
     <div className="Home">
-      <p>Welcome to scratch</p>
+      <LinkContainer to="/books/new" style={{ marginBottom: 10 }}>
+        <Button variant="secondary">Add new book to collection</Button>
+      </LinkContainer>
       <input
         type="search"
         name="search-books"
@@ -165,9 +167,17 @@ export function Books() {
   return (
     <div>
       {data?.map((book) => (
-        <div key={book.bookId}>
+        <div
+          style={{
+            border: "1px solid #ccc",
+            padding: "10px",
+            borderRadius: "5px",
+          }}
+          key={book.bookId}
+        >
           <h3>{book.title}</h3>
-          <p>{book.author}</p>
+          <p>{book.author_name}</p>
+          <Link to={`/books/${book.bookId}`}>View details</Link>
         </div>
       ))}
     </div>

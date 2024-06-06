@@ -22,6 +22,8 @@
     "react-icons": "^5.2.1",
     "react-router-bootstrap": "^0.26.2",
     "react-router-dom": "^6.23.1",
+    "react-trix": "^0.10.2",
+    "use-debounce": "^10.0.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {

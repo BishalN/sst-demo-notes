@@ -9,21 +9,20 @@ export const main = handler(async (event) => {
     throw new Error("Missing book id");
   }
 
-  const data = UpdateBookSchema.parse(JSON.parse(event.body || "{}"));
+  const data = JSON.parse(event.body || "{}");
+
+  console.log(data);
+
+  // const data = UpdateBookSchema.parse(JSON.parse(event.body || "{}"));
 
   await dynamodb.update({
-    TableName: Table.Notes.tableName,
+    TableName: Table.mybooks.tableName,
     Key: {
       userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId,
       bookId: event?.pathParameters?.id,
     },
-    UpdateExpression:
-      "SET title = :title, author = :author, genre = :genre, readingStatus = :readingStatus, notes = :notes, updatedAt = :updatedAt",
+    UpdateExpression: "SET  notes = :notes, updatedAt = :updatedAt",
     ExpressionAttributeValues: {
-      ":title": data.title || null,
-      ":author": data.author || null,
-      ":genre": data.genre || null,
-      ":readingStatus": data.readingStatus || null,
       ":notes": data.notes || null,
       ":updatedAt": Date.now(),
     },

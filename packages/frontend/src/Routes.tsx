@@ -8,6 +8,9 @@ import Notes from "./containers/Notes.tsx";
 import Settings from "./containers/Settings.tsx";
 import UnauthenticatedRoute from "./components/UnauthenticatedRoute.tsx";
 import AuthenticatedRoute from "./components/AuthenticatedRoute.tsx";
+import { NewBookForm } from "./components/NewBookForm.tsx";
+import { BookPage } from "./containers/Book.tsx";
+import { BookSearch } from "./containers/BookSearch.tsx";
 
 export default function Links() {
   return (
@@ -38,10 +41,34 @@ export default function Links() {
         }
       />
       <Route
+        path="/search"
+        element={
+          <AuthenticatedRoute>
+            <BookSearch />
+          </AuthenticatedRoute>
+        }
+      />
+      <Route
         path="/notes/new"
         element={
           <AuthenticatedRoute>
             <NewNote />
+          </AuthenticatedRoute>
+        }
+      />
+      <Route
+        path="/books/new"
+        element={
+          <AuthenticatedRoute>
+            <NewBookForm />
+          </AuthenticatedRoute>
+        }
+      />
+      <Route
+        path="/books/:id"
+        element={
+          <AuthenticatedRoute>
+            <BookPage />
           </AuthenticatedRoute>
         }
       />

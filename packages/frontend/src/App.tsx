@@ -64,9 +64,6 @@ function App() {
                     <LinkContainer to="/">
                       <Nav.Link>My Collections</Nav.Link>
                     </LinkContainer>
-                    <LinkContainer to="/notes">
-                      <Nav.Link>Notes</Nav.Link>
-                    </LinkContainer>
 
                     <LinkContainer to="/search">
                       <Nav.Link>Search</Nav.Link>
