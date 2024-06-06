@@ -1,12 +1,25 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/dashboard")({
-  component: () => <div>Hello world</div>,
+  beforeLoad: ({ context, location }) => {
+    if (!context.auth.isAuthenticated) {
+      throw redirect({
+        to: "/login",
+        search: {
+          redirect: location.href,
+        },
+      });
+    }
+  },
+  component: Dashboard1,
 });
 
-// now the real deal of creating application with sst starts
-// create crud api for book collection and notes manager
-
-// create, read(single, all), update, delete api for book collection
-// thats it on the backend side
-// on frontend side, use openlibrary api to search for books and add to collection
+export function Dashboard1() {
+  return (
+    <DashboardLayout>
+      <Button>Dashboard</Button>
+    </DashboardLayout>
+  );
+}

@@ -8,6 +8,17 @@ import { AuthProvider } from "./auth";
 import React from "react";
 import { useAuth } from "./hooks/useAuth";
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 10,
+    },
+  },
+});
+
 // Set up a Router instance
 const router = createRouter({
   routeTree,
@@ -50,6 +61,11 @@ Amplify.configure({
         endpoint: config.apiGateway.URL,
         region: config.apiGateway.REGION,
       },
+      {
+        name: "books",
+        endpoint: config.apiGateway.URL,
+        region: config.apiGateway.REGION,
+      },
     ],
   },
 });
@@ -67,7 +83,10 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <React.StrictMode>
-      <App />
+      <QueryClientProvider client={queryClient}>
+        <App />
+        <ReactQueryDevtools buttonPosition="bottom-right" />
+      </QueryClientProvider>
     </React.StrictMode>
   );
 }
